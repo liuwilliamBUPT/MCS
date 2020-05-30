@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'C:\Users\William\Desktop\测控系统\UI\signal.ui'
+# Form implementation generated from reading ui file 'C:\Users\William\Desktop\测控系统\MCS\signal.ui'
 #
 # Created by: PyQt5 UI code generator 5.14.2
 #

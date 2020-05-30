@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'C:\Users\William\Desktop\测控系统\UI\mcs.ui'
+# Form implementation generated from reading ui file 'C:\Users\William\Desktop\测控系统\MCS\mcs.ui'
 #
 # Created by: PyQt5 UI code generator 5.14.2
 #
@@ -66,6 +66,7 @@ class Ui_MCS(object):
         self.horizontalLayout.addWidget(self.label)
         self.lineEdit = QtWidgets.QLineEdit(self.groupBox_6)
         self.lineEdit.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.lineEdit.setReadOnly(True)
         self.lineEdit.setObjectName("lineEdit")
         self.horizontalLayout.addWidget(self.lineEdit)
         self.formLayout.setLayout(0, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout)
@@ -84,6 +85,7 @@ class Ui_MCS(object):
         self.lineEdit_3.setSizePolicy(sizePolicy)
         self.lineEdit_3.setMinimumSize(QtCore.QSize(137, 0))
         self.lineEdit_3.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.lineEdit_3.setReadOnly(True)
         self.lineEdit_3.setObjectName("lineEdit_3")
         self.horizontalLayout_4.addWidget(self.lineEdit_3)
         spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
@@ -97,6 +99,7 @@ class Ui_MCS(object):
         self.horizontalLayout_3.addWidget(self.label_2)
         self.lineEdit_2 = QtWidgets.QLineEdit(self.groupBox_6)
         self.lineEdit_2.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.lineEdit_2.setReadOnly(True)
         self.lineEdit_2.setObjectName("lineEdit_2")
         self.horizontalLayout_3.addWidget(self.lineEdit_2)
         self.formLayout.setLayout(1, QtWidgets.QFormLayout.LabelRole, self.horizontalLayout_3)
