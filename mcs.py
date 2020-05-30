@@ -49,7 +49,7 @@ class MCS(QMainWindow, Ui_MCS):
         self.toolbar2 = NavigationToolbar(self.canvas2, self)
         self.toolbar2.hide()
 
-        # 
+        # 一些初始化变量值
         self.scrollbar_value = 1000
         self.signal_wave = None
         self.amplitude = 2.5, 2.5
@@ -64,70 +64,61 @@ class MCS(QMainWindow, Ui_MCS):
         self.menuGroupSingal.setExclusive(True)
         
     def zoom(self):
-        """
-        缩放图像
-        """
+        """缩放图像。"""
         self.toolbar1.zoom()
         self.toolbar2.zoom()
 
     def pan(self):
-        """
-        拖动图像
-        """
+        """拖动图像。"""
         self.toolbar1.pan()
         self.toolbar2.pan()
 
     def home(self):
-        """
-        还原图像
-        """
+        """还原图像。"""
         self.toolbar1.home()
         
     def save(self):
-        """
-        保持图像
-        """
+        """保存图像。"""
         self.toolbar1.save_figure()
         self.toolbar2.save_figure()
         
     @pyqtSlot()
     def on_pushButton_clicked(self):
-        """
-        pushButton 被点击时，绘制图像。
-        """
+        """pushButton 被点击时，绘制图像。"""
         self.plot()
     
     @pyqtSlot()
     def on_pushButton_2_clicked(self):
-        """
-        pushButton2 被点击时，允许缩放图像。
-        """
+        """pushButton2 被点击时，允许缩放图像。"""
         self.zoom()
     
     @pyqtSlot()
     def on_pushButton_3_clicked(self):
-        """
-        pushButton3 被点击时，允许拖动图像。
-        """
+        """pushButton3 被点击时，允许拖动图像。"""
         self.pan()
     
     def generate_signal(self, freq, sample_freq):
-        """
-        信号生成
-        """
+        """根据传入参数及预设，生成对应信号。"""
+        # 函数的相位
         phase = 2 * np.pi * freq * sample_freq
-        nosie = np.random.randn(*np.shape(sample_freq))/10
+
+        # 模拟产生噪音信号
+        noise = np.random.randn(*np.shape(sample_freq)) / 10
+
         if self.signal_wave == 3:
-            return self.amplitude[0] * np.sin(phase) + nosie + self.amplitude[1]
+            # 返回正弦波
+            return self.amplitude[0] * np.sin(phase) + noise + self.amplitude[1]
         elif self.signal_wave == 2:
-            return self.amplitude[0] * signal.sawtooth(phase,  0.5) + nosie + self.amplitude[1]
+            # 返回三角波
+            return (self.amplitude[0] * signal.sawtooth(phase,  0.5) + noise
+                    + self.amplitude[1])
         else:
-            return self.amplitude[0] * signal.square(phase) + nosie + self.amplitude[1]
+            # 返回方波
+            return (self.amplitude[0] * signal.square(phase) + noise +
+                    self.amplitude[1])
     
     def plot(self):
-        """
-        绘制图像
-        """
+        """绘制图像。"""
         # a = self.canvas1.update_figure()
         # x=np.linspace(0, 1, 5000)
         # y=7*np.sin(2*np.pi*180*x)
@@ -151,9 +142,9 @@ class MCS(QMainWindow, Ui_MCS):
         else:
             N = int(self.scrollbar_value/10)
             f_s = 80
-            x=np.linspace(0, 5, N, endpoint=False)
-            #k=np.arange(1,99)
-            #k=2*k-1
+            x = np.linspace(0, 5, N, endpoint=False)
+            # k=np.arange(1,99)
+            # k=2*k-1
             # y=np.zeros_like(x)
             freq = signal_dlg.freq
             sample_freq = x
@@ -172,17 +163,20 @@ class MCS(QMainWindow, Ui_MCS):
         
         self.lineEdit.setText(str(np.max(yf2)))
         self.canvas1.draw_(x, y)
-        self.canvas2.draw_(xf2,yf2)
+        self.canvas2.draw_(xf2, yf2)
         
-    def generate_export_data(self,x, y, N, f_s):
-        self.data = f"{N}\n{f_s}\n" +"\n".join([ str(i) for i in zip(x, y) ])
+    def generate_export_data(self, x, y, N, f_s):
+        """
+
+        """
+        self.data = f"{N}\n{f_s}\n" + "\n".join([str(i) for i in zip(x, y)])
         
     def resume_data_from_file(self):
         data = self.data.split("\n")
-        list_data = [ eval(i) for i in data[2:] ]
-        N =int(data[0])
+        list_data = [eval(i) for i in data[2:]]
+        N = int(data[0])
         f_s = int(data[1])
-        x, y =map(list, zip(*list_data))
+        x, y = map(list, zip(*list_data))
         x = np.array(x)
         y = np.array(y)
         return x, y, N, f_s
@@ -415,7 +409,8 @@ class Canvas(FigureCanvas):
         
     def compute_initial_figure(self):
         pass      
-        
+
+
 class TestCanvas(Canvas):
     def __init__(self, *args, **kwargs):
         Canvas.__init__(self, *args, **kwargs)
@@ -435,10 +430,13 @@ class TestCanvas(Canvas):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    # 启动主窗口
     mainWindow = MCS()
     mainWindow.show()
+    # 加载数据窗口
     Dialog = QDialog()
     dlg_ui = Ui_Dialog()
     dlg_ui.setupUi(Dialog)
+    # 加载波形频率窗口
     signal_dlg = Signal()
     sys.exit(app.exec_())
