@@ -11,9 +11,11 @@ import numpy as np
 from scipy.fft import fft,  fftfreq
 from scipy import signal
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import QMainWindow, QApplication, QSizePolicy, QActionGroup, QDialog, QFileDialog
+from PyQt5.QtWidgets import (QMainWindow, QApplication, QSizePolicy,
+                             QActionGroup, QDialog, QFileDialog)
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+from matplotlib.backends.backend_qt5agg import (NavigationToolbar2QT
+                                                as NavigationToolbar)
 from matplotlib.figure import Figure
 
 
@@ -72,10 +74,6 @@ class MCS(QMainWindow, Ui_MCS):
         """拖动图像。"""
         self.toolbar1.pan()
         self.toolbar2.pan()
-
-    def home(self):
-        """还原图像。"""
-        self.toolbar1.home()
         
     def save(self):
         """保存图像。"""
@@ -96,6 +94,61 @@ class MCS(QMainWindow, Ui_MCS):
     def on_pushButton_3_clicked(self):
         """pushButton3 被点击时，允许拖动图像。"""
         self.pan()
+
+    @pyqtSlot()
+    def on_pushButton_4_clicked(self):
+        """
+        点击 pushButton_4（还原采样波形） 触发采样波形恢复。
+        """
+        self.toolbar1.home()
+
+    @pyqtSlot()
+    def on_pushButton_5_clicked(self):
+        """
+        点击 pushButton_5（缩放） 允许缩放波形。
+        """
+        self.zoom()
+
+    @pyqtSlot()
+    def on_pushButton_6_clicked(self):
+        """
+        点击 pushButton_6（拖动） 允许拖动波形。
+        """
+        self.pan()
+
+    @pyqtSlot()
+    def on_pushButton_7_clicked(self):
+        """
+        点击 pushButton_7（保存） 依次弹出保存图形窗口。
+        """
+        self.save()
+
+    @pyqtSlot()
+    def on_pushButton_8_clicked(self):
+        """
+        点击 pushButton_8（还原FFT） 触发FFT波形恢复
+        """
+        self.toolbar2.home()
+
+    @pyqtSlot()
+    def on_pushButton_9_clicked(self):
+        """
+        点击 pushButton_9（采样数据），从 self.data 中读取数据，并写入弹出对话框中的
+        文本框；如果 self.data 为空，则向文本框中写入报错信息。
+        """
+        if self.data:
+            dlg_ui.textEdit.setText(self.data)
+        else:
+            dlg_ui.textEdit.setText("请先采集数据或导入数据。")
+        Dialog.show()
+
+    @pyqtSlot()
+    def on_pushButton_10_clicked(self):
+        """
+        点击 pushButton_10（频率设置） 弹出频率设置对话框。
+        """
+        # TODO: not implemented yet
+        signal_dlg.show()
     
     def generate_signal(self, freq, sample_freq):
         """根据传入参数及预设，生成对应信号。"""
@@ -166,12 +219,11 @@ class MCS(QMainWindow, Ui_MCS):
         self.canvas2.draw_(xf2, yf2)
         
     def generate_export_data(self, x, y, N, f_s):
-        """
-
-        """
+        """生成用于输出的数据。"""
         self.data = f"{N}\n{f_s}\n" + "\n".join([str(i) for i in zip(x, y)])
         
     def resume_data_from_file(self):
+        """从文件中恢复数据。"""
         data = self.data.split("\n")
         list_data = [eval(i) for i in data[2:]]
         N = int(data[0])
@@ -182,37 +234,9 @@ class MCS(QMainWindow, Ui_MCS):
         return x, y, N, f_s
     
     @pyqtSlot()
-    def on_pushButton_4_clicked(self):
-        """
-        Slot documentation goes here.
-        """
-        self.home()
-    
-    @pyqtSlot()
-    def on_pushButton_5_clicked(self):
-        """
-        Slot documentation goes here.
-        """
-        self.zoom()
-    
-    @pyqtSlot()
-    def on_pushButton_6_clicked(self):
-        """
-        Slot documentation goes here.
-        """
-        self.pan()
-    
-    @pyqtSlot()
-    def on_pushButton_7_clicked(self):
-        """
-        Slot documentation goes here.
-        """
-        self.save()
-    
-    @pyqtSlot()
     def on_action_Exit_triggered(self):
         """
-        Slot documentation goes here.
+        点击 File-Exit 退出程序。
         """
         self.close()
 
@@ -224,17 +248,10 @@ class MCS(QMainWindow, Ui_MCS):
         # TODO: not implemented yet
         raise NotImplementedError
     
-    @pyqtSlot()
-    def on_pushButton_8_clicked(self):
-        """
-        Slot documentation goes here.
-        """
-        self.toolbar2.home()
-    
     @pyqtSlot(int)
     def on_horizontalScrollBar_valueChanged(self, value):
         """
-        Slot documentation goes here.
+        将水平滑动控件与 lineEdit_4 绑定，当滑条数值改变时，对应改变文本框中的数值。
         
         @param value DESCRIPTION
         @type int
@@ -245,7 +262,7 @@ class MCS(QMainWindow, Ui_MCS):
     @pyqtSlot(str)
     def on_lineEdit_4_textChanged(self, p0):
         """
-        Slot documentation goes here.
+        将文本框与水平滑条绑定，当文本框中的数值改变时，滑条移动到对应地方。
         
         @param p0 DESCRIPTION
         @type str
@@ -260,7 +277,7 @@ class MCS(QMainWindow, Ui_MCS):
     @pyqtSlot(bool)
     def on_actionSquare_triggered(self, checked):
         """
-        Slot documentation goes here.
+        点击 View-Signal-Square 时，将类属性 signal_wave 设置为1，即表示方波。
         
         @param checked DESCRIPTION
         @type bool
@@ -270,7 +287,7 @@ class MCS(QMainWindow, Ui_MCS):
     @pyqtSlot(bool)
     def on_actionTriangle_triggered(self, checked):
         """
-        Slot documentation goes here.
+        点击 View-Signal-Triangle 时，将类属性 signal_wave 设置为2，即表示三角波。
         
         @param checked DESCRIPTION
         @type bool
@@ -280,28 +297,55 @@ class MCS(QMainWindow, Ui_MCS):
     @pyqtSlot(bool)
     def on_actionSin_triggered(self, checked):
         """
-        Slot documentation goes here.
+        点击 View-Signal-Sine 时，将类属性 signal_wave 设置为3，即表示正弦波。
         
         @param checked DESCRIPTION
         @type bool
         """
         self.signal_wave = 3 if checked else None
-    
+
+    # 单选框代码，即选则输入电压。
+    @pyqtSlot(bool)
+    def on_radioButton_toggled(self, checked):
+        """
+        选中 radioButton 时，将类属性 amplitude 设置为 (2.5, 2.5)，
+        即输入电压为 0~5V。
+
+        @param checked DESCRIPTION
+        @type bool
+        """
+        if checked:
+            self.amplitude = 2.5, 2.5
+
     @pyqtSlot(bool)
     def on_radioButton_2_toggled(self, checked):
         """
-        Slot documentation goes here.
+        选中 radioButton_2 时，将类属性 amplitude 设置为 (5, 5)，
+        即输入电压为 0~10V。
         
         @param checked DESCRIPTION
         @type bool
         """
         if checked:
             self.amplitude = 5, 5
-    
+
+    @pyqtSlot(bool)
+    def on_radioButton_3_toggled(self, checked):
+        """
+        选中 radioButton_3 时，将类属性 amplitude 设置为 (5, 0)，
+        即输入电压为 -5~+5V。
+
+        @param checked DESCRIPTION
+        @type bool
+        """
+        if checked:
+            self.amplitude = 5, 0
+
     @pyqtSlot(bool)
     def on_radioButton_4_toggled(self, checked):
         """
-        Slot documentation goes here.
+        选中 radioButton_4 时，将类属性 amplitude 设置为 (10, 0)，
+        即输入电压为 -10~+10V。
         
         @param checked DESCRIPTION
         @type bool
@@ -309,46 +353,13 @@ class MCS(QMainWindow, Ui_MCS):
         if checked:
             self.amplitude = 10, 0
     
-    @pyqtSlot(bool)
-    def on_radioButton_3_toggled(self, checked):
-        """
-        Slot documentation goes here.
-        
-        @param checked DESCRIPTION
-        @type bool
-        """
-        if checked:
-            self.amplitude = 5, 0 
-    
-    @pyqtSlot(bool)
-    def on_radioButton_toggled(self, checked):
-        """
-        Slot documentation goes here.
-        
-        @param checked DESCRIPTION
-        @type bool
-        """
-        if checked:
-            self.amplitude = 2.5, 2.5 
-    
-    @pyqtSlot()
-    def on_pushButton_9_clicked(self):
-        """
-        Slot documentation goes here.
-        """
-        if self.data:
-            dlg_ui.textEdit.setText(self.data)
-        else:
-            dlg_ui.textEdit.setText("请先采集数据或导入数据。")
-        Dialog.show()
-    
     @pyqtSlot()
     def on_actionExport_Data_triggered(self):
         """
-        Slot documentation goes here.
+         点击 File—Export Data，将储存在 self.data中的数据导出到文件。
         """
         fileName, _ = QFileDialog.getSaveFileName(self, "Export Data")
-        # todo: z检查是否有数据，没有就弹窗
+        # todo: 检查是否有数据，没有就弹窗报错
         if fileName:
             file = open(fileName, 'w')
             text = self.data
@@ -384,14 +395,6 @@ class MCS(QMainWindow, Ui_MCS):
             # 抛出错误？
             self.external_flag = True
             file.close()
-    
-    @pyqtSlot()
-    def on_pushButton_10_clicked(self):
-        """
-        Slot documentation goes here.
-        """
-        # TODO: not implemented yet
-        signal_dlg.show()
             
         
 class Canvas(FigureCanvas):
@@ -414,9 +417,6 @@ class Canvas(FigureCanvas):
 class TestCanvas(Canvas):
     def __init__(self, *args, **kwargs):
         Canvas.__init__(self, *args, **kwargs)
-        # timer = QTimer(self)
-        # timer.timeout.connect(self.update_figure)
-        # timer.start(1000)
 
     def compute_initial_figure(self):
         self.axes.plot([i for i in range(50)], [i for i in range(50)], 'r')
