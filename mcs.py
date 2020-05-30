@@ -8,16 +8,15 @@ import sys
 
 import numpy as np
 
-from scipy.fft import fft,  fftfreq
+from scipy.fft import fft, fftfreq
 from scipy import signal
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QSizePolicy,
-                             QActionGroup, QDialog, QFileDialog)
+                             QActionGroup, QDialog, QFileDialog, QMessageBox)
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import (NavigationToolbar2QT
                                                 as NavigationToolbar)
 from matplotlib.figure import Figure
-
 
 from Ui_mcs import Ui_MCS
 from Ui_data import Ui_Dialog
@@ -28,6 +27,7 @@ class MCS(QMainWindow, Ui_MCS):
     """
     Class documentation goes here.
     """
+
     def __init__(self, parent=None):
         """
         Constructor
@@ -64,7 +64,7 @@ class MCS(QMainWindow, Ui_MCS):
         self.menuGroupSingal.addAction(self.actionTriangle)
         self.menuGroupSingal.addAction(self.actionSin)
         self.menuGroupSingal.setExclusive(True)
-        
+
     def zoom(self):
         """缩放图像。"""
         self.toolbar1.zoom()
@@ -74,22 +74,22 @@ class MCS(QMainWindow, Ui_MCS):
         """拖动图像。"""
         self.toolbar1.pan()
         self.toolbar2.pan()
-        
+
     def save(self):
         """保存图像。"""
         self.toolbar1.save_figure()
         self.toolbar2.save_figure()
-        
+
     @pyqtSlot()
     def on_pushButton_clicked(self):
         """pushButton 被点击时，绘制图像。"""
         self.plot()
-    
+
     @pyqtSlot()
     def on_pushButton_2_clicked(self):
         """pushButton2 被点击时，允许缩放图像。"""
         self.zoom()
-    
+
     @pyqtSlot()
     def on_pushButton_3_clicked(self):
         """pushButton3 被点击时，允许拖动图像。"""
@@ -147,9 +147,8 @@ class MCS(QMainWindow, Ui_MCS):
         """
         点击 pushButton_10（频率设置） 弹出频率设置对话框。
         """
-        # TODO: not implemented yet
         signal_dlg.show()
-    
+
     def generate_signal(self, freq, sample_freq):
         """根据传入参数及预设，生成对应信号。"""
         # 函数的相位
@@ -163,13 +162,13 @@ class MCS(QMainWindow, Ui_MCS):
             return self.amplitude[0] * np.sin(phase) + noise + self.amplitude[1]
         elif self.signal_wave == 2:
             # 返回三角波
-            return (self.amplitude[0] * signal.sawtooth(phase,  0.5) + noise
+            return (self.amplitude[0] * signal.sawtooth(phase, 0.5) + noise
                     + self.amplitude[1])
         else:
             # 返回方波
             return (self.amplitude[0] * signal.square(phase) + noise +
                     self.amplitude[1])
-    
+
     def plot(self):
         """绘制图像。"""
         # a = self.canvas1.update_figure()
@@ -190,10 +189,10 @@ class MCS(QMainWindow, Ui_MCS):
         # self.canvas2.draw_(xf2,yf2)
         if self.external_flag:
             x, y, N, f_s = self.resume_data_from_file()
-            self.horizontalScrollBar.setValue(int(N/100))
+            self.horizontalScrollBar.setValue(int(N / 100))
             self.external_flag = False
         else:
-            N = int(self.scrollbar_value/10)
+            N = int(self.scrollbar_value / 10)
             f_s = 80
             x = np.linspace(0, 5, N, endpoint=False)
             # k=np.arange(1,99)
@@ -209,19 +208,19 @@ class MCS(QMainWindow, Ui_MCS):
         xf2 = np.arange(len(y))
         # y = signal.square(2 * np.pi * 5 * t)
         yf2 = fft(y)
-        f = fftfreq(N, 1.0/f_s)
+        f = fftfreq(N, 1.0 / f_s)
         mask = np.where(f >= 0)
         xf2 = f[mask]
-        yf2 = abs(yf2[mask]/N)
-        
+        yf2 = abs(yf2[mask] / N)
+
         self.lineEdit.setText(str(np.max(yf2)))
         self.canvas1.draw_(x, y)
         self.canvas2.draw_(xf2, yf2)
-        
+
     def generate_export_data(self, x, y, N, f_s):
         """生成用于输出的数据。"""
         self.data = f"{N}\n{f_s}\n" + "\n".join([str(i) for i in zip(x, y)])
-        
+
     def resume_data_from_file(self):
         """从文件中恢复数据。"""
         data = self.data.split("\n")
@@ -232,7 +231,7 @@ class MCS(QMainWindow, Ui_MCS):
         x = np.array(x)
         y = np.array(y)
         return x, y, N, f_s
-    
+
     @pyqtSlot()
     def on_action_Exit_triggered(self):
         """
@@ -247,7 +246,7 @@ class MCS(QMainWindow, Ui_MCS):
         """
         # TODO: not implemented yet
         raise NotImplementedError
-    
+
     @pyqtSlot(int)
     def on_horizontalScrollBar_valueChanged(self, value):
         """
@@ -256,9 +255,9 @@ class MCS(QMainWindow, Ui_MCS):
         @param value DESCRIPTION
         @type int
         """
-        self.lineEdit_4.setText(str(value/10))
+        self.lineEdit_4.setText(str(value / 10))
         self.scrollbar_value = value * 1000
-    
+
     @pyqtSlot(str)
     def on_lineEdit_4_textChanged(self, p0):
         """
@@ -269,11 +268,11 @@ class MCS(QMainWindow, Ui_MCS):
         """
         if p0:
             # 错误检查 2.0.多输入的0不允许输入或者怎么处理。
-            self.horizontalScrollBar.setValue(int(float(p0)*10))
+            self.horizontalScrollBar.setValue(int(float(p0) * 10))
         else:
             # bug: 初始化时候的1不是1
             self.horizontalScrollBar.setValue(1)
-    
+
     @pyqtSlot(bool)
     def on_actionSquare_triggered(self, checked):
         """
@@ -283,7 +282,7 @@ class MCS(QMainWindow, Ui_MCS):
         @type bool
         """
         self.signal_wave = 1 if checked else None
-    
+
     @pyqtSlot(bool)
     def on_actionTriangle_triggered(self, checked):
         """
@@ -293,7 +292,7 @@ class MCS(QMainWindow, Ui_MCS):
         @type bool
         """
         self.signal_wave = 2 if checked else None
-    
+
     @pyqtSlot(bool)
     def on_actionSin_triggered(self, checked):
         """
@@ -352,20 +351,25 @@ class MCS(QMainWindow, Ui_MCS):
         """
         if checked:
             self.amplitude = 10, 0
-    
+
     @pyqtSlot()
     def on_actionExport_Data_triggered(self):
         """
          点击 File—Export Data，将储存在 self.data中的数据导出到文件。
         """
-        fileName, _ = QFileDialog.getSaveFileName(self, "Export Data")
-        # todo: 检查是否有数据，没有就弹窗报错
-        if fileName:
-            file = open(fileName, 'w')
-            text = self.data
-            file.write(text)
-            file.close()
-    
+        # todo: 导出到 json
+        if self.data:
+            fileName, _ = QFileDialog.getSaveFileName(self, "Export Data")
+            if fileName:
+                file = open(fileName, 'w')
+                text = self.data
+                file.write(text)
+                file.close()
+        else:
+            reply = QMessageBox.warning(self, "警告", "请先采集数据！",
+                                        QMessageBox.Yes | QMessageBox.No,
+                                        QMessageBox.Yes)
+
     @pyqtSlot()
     def on_actionExport_Data_As_triggered(self):
         """
@@ -373,7 +377,7 @@ class MCS(QMainWindow, Ui_MCS):
         """
         # TODO: not implemented yet
         raise NotImplementedError
-    
+
     @pyqtSlot()
     def on_actionSave_triggered(self):
         """
@@ -381,7 +385,7 @@ class MCS(QMainWindow, Ui_MCS):
         """
         # TODO: not implemented yet
         self.save()
-    
+
     @pyqtSlot()
     def on_actionOpen_triggered(self):
         """
@@ -390,13 +394,13 @@ class MCS(QMainWindow, Ui_MCS):
         # TODO: not implemented yet
         fileName, _ = QFileDialog.getOpenFileName(self, "Open File")
         if fileName:
-            file = open(fileName,  "r")
+            file = open(fileName, "r")
             self.data = file.read()
             # 抛出错误？
             self.external_flag = True
             file.close()
-            
-        
+
+
 class Canvas(FigureCanvas):
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         fig = Figure(figsize=(width, height), dpi=dpi)
@@ -409,9 +413,9 @@ class Canvas(FigureCanvas):
                                    QSizePolicy.Expanding,
                                    QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
-        
+
     def compute_initial_figure(self):
-        pass      
+        pass
 
 
 class TestCanvas(Canvas):
