@@ -10,9 +10,10 @@ import numpy as np
 
 from scipy.fft import fft, fftfreq
 from scipy import signal
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot, QRegExp
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QSizePolicy,
                              QActionGroup, QDialog, QFileDialog, QMessageBox)
+from PyQt5.QtGui import QRegExpValidator
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import (NavigationToolbar2QT
                                                 as NavigationToolbar)
@@ -51,12 +52,17 @@ class MCS(QMainWindow, Ui_MCS):
         self.toolbar2 = NavigationToolbar(self.canvas2, self)
         self.toolbar2.hide()
 
+        # 为文本框添加 validator
+        regex = QRegExp(r'^100(\.0)?$|^[1-9]?[0-9](\.[0-9])?$')
+        self.lineEdit_4.setValidator(QRegExpValidator(regex, self))
+
         # 一些初始化变量值
         self.scrollbar_value = 1000
         self.signal_wave = None
         self.amplitude = 2.5, 2.5
         self.data = None
         self.external_flag = False
+        self.sample_freq_value = 0.1
 
         # 将菜单栏中的 signal 选项改为单选。
         self.menuGroupSingal = QActionGroup(self.menuSignal)
@@ -251,27 +257,23 @@ class MCS(QMainWindow, Ui_MCS):
     def on_horizontalScrollBar_valueChanged(self, value):
         """
         将水平滑动控件与 lineEdit_4 绑定，当滑条数值改变时，对应改变文本框中的数值。
-        
+
         @param value DESCRIPTION
         @type int
         """
         self.lineEdit_4.setText(str(value / 10))
         self.scrollbar_value = value * 1000
 
-    @pyqtSlot(str)
-    def on_lineEdit_4_textChanged(self, p0):
+    @pyqtSlot()
+    def on_lineEdit_4_editingFinished(self):
         """
-        将文本框与水平滑条绑定，当文本框中的数值改变时，滑条移动到对应地方。
-        
-        @param p0 DESCRIPTION
-        @type str
+        Slot documentation goes here.
         """
-        if p0:
-            # 错误检查 2.0.多输入的0不允许输入或者怎么处理。
-            self.horizontalScrollBar.setValue(int(float(p0) * 10))
+        if self.lineEdit_4.text():
+            value = int(float(self.lineEdit_4.text()) * 10)
+            self.horizontalScrollBar.setValue(value)
         else:
-            # bug: 初始化时候的1不是1
-            self.horizontalScrollBar.setValue(1)
+            self.horizontalScrollBar.setValue(0.1)
 
     @pyqtSlot(bool)
     def on_actionSquare_triggered(self, checked):
@@ -383,7 +385,6 @@ class MCS(QMainWindow, Ui_MCS):
         """
         Slot documentation goes here.
         """
-        # TODO: not implemented yet
         self.save()
 
     @pyqtSlot()
