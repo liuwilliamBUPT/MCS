@@ -6,15 +6,9 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>797</width>
-    <height>720</height>
+    <width>971</width>
+    <height>656</height>
    </rect>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>780</width>
-    <height>720</height>
-   </size>
   </property>
   <property name="windowTitle">
    <string>MCS(测控系统课程软件设计)</string>
@@ -23,8 +17,8 @@
    <string/>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QGridLayout" name="gridLayout_2">
-    <item row="0" column="0">
+   <layout class="QHBoxLayout" name="horizontalLayout_6">
+    <item>
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -36,16 +30,15 @@
           <property name="title">
            <string>采样波形</string>
           </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <layout class="QVBoxLayout" name="verticalLayout">
            <item>
-            <widget class="QFrame" name="frame">
-             <property name="frameShape">
-              <enum>QFrame::StyledPanel</enum>
+            <widget class="QGraphicsView" name="graphicsView">
+             <property name="minimumSize">
+              <size>
+               <width>443</width>
+               <height>0</height>
+              </size>
              </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
-             </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_15"/>
             </widget>
            </item>
           </layout>
@@ -56,16 +49,15 @@
           <property name="title">
            <string>采样波形FFT</string>
           </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_13">
+          <layout class="QVBoxLayout" name="verticalLayout_8">
            <item>
-            <widget class="QFrame" name="frame_2">
-             <property name="frameShape">
-              <enum>QFrame::StyledPanel</enum>
+            <widget class="QGraphicsView" name="graphicsView_2">
+             <property name="minimumSize">
+              <size>
+               <width>443</width>
+               <height>0</height>
+              </size>
              </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
-             </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_14"/>
             </widget>
            </item>
           </layout>
@@ -139,9 +131,6 @@
                    <height>0</height>
                   </size>
                  </property>
-                 <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                 </property>
                 </widget>
                </item>
                <item>
@@ -170,14 +159,14 @@
                   </size>
                  </property>
                  <property name="text">
-                  <string>频率 (kHz)</string>
+                  <string>频率 (KHz)</string>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QLineEdit" name="lineEdit_2">
                  <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  <set>Qt::AlignJustify|Qt::AlignVCenter</set>
                  </property>
                 </widget>
                </item>
@@ -239,9 +228,6 @@
                <property name="text">
                 <string>0 ~ 5 V</string>
                </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
               </widget>
              </item>
             </layout>
@@ -262,7 +248,7 @@
                <item>
                 <widget class="QLabel" name="label_4">
                  <property name="text">
-                  <string>采样频率 (kHz)</string>
+                  <string>采样频率 (KHz)</string>
                  </property>
                 </widget>
                </item>
@@ -280,14 +266,7 @@
                 </spacer>
                </item>
                <item>
-                <widget class="QLineEdit" name="lineEdit_4">
-                 <property name="text">
-                  <string>0.1</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                 </property>
-                </widget>
+                <widget class="QLineEdit" name="lineEdit_4"/>
                </item>
                <item>
                 <spacer name="horizontalSpacer_5">
@@ -306,15 +285,6 @@
              </item>
              <item>
               <widget class="QScrollBar" name="horizontalScrollBar">
-               <property name="minimum">
-                <number>1</number>
-               </property>
-               <property name="maximum">
-                <number>1000</number>
-               </property>
-               <property name="value">
-                <number>1</number>
-               </property>
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
@@ -326,45 +296,61 @@
          </widget>
         </item>
         <item>
-         <widget class="QGroupBox" name="groupBox_7">
-          <property name="title">
-           <string>采样设置</string>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
           </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <item>
-            <layout class="QGridLayout" name="gridLayout_4">
-             <item row="0" column="0">
-              <widget class="QPushButton" name="pushButton">
-               <property name="text">
-                <string>开始采样/恢复数据</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QPushButton" name="pushButton_2">
-               <property name="text">
-                <string>停止采样</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QPushButton" name="pushButton_3">
-               <property name="text">
-                <string>静态显示</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QPushButton" name="pushButton_9">
-               <property name="text">
-                <string>采样数据</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-          </layout>
-         </widget>
+          <property name="sizeType">
+           <enum>QSizePolicy::Minimum</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QPushButton" name="pushButton">
+            <property name="text">
+             <string>开始采样</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_2">
+            <property name="text">
+             <string>停止采样</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_3">
+            <property name="text">
+             <string>静态显示</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Minimum</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
         </item>
         <item>
          <widget class="QGroupBox" name="groupBox_5">
@@ -372,52 +358,64 @@
            <bool>true</bool>
           </property>
           <property name="title">
-           <string>波形设置</string>
+           <string>波形比例调整</string>
           </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <layout class="QVBoxLayout" name="verticalLayout_6">
            <item>
-            <layout class="QGridLayout" name="gridLayout_3">
-             <item row="0" column="2">
-              <widget class="QPushButton" name="pushButton_5">
-               <property name="text">
-                <string>缩放</string>
-               </property>
-              </widget>
+            <layout class="QHBoxLayout" name="horizontalLayout_11">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_9">
+               <item>
+                <widget class="QLabel" name="label_5">
+                 <property name="text">
+                  <string>采样波形</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_2">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
              </item>
-             <item row="1" column="0">
-              <widget class="QPushButton" name="pushButton_6">
-               <property name="text">
-                <string>拖动</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <widget class="QPushButton" name="pushButton_4">
-               <property name="text">
-                <string>还原采样波形</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QPushButton" name="pushButton_8">
-               <property name="text">
-                <string>还原FFT</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QPushButton" name="pushButton_7">
-               <property name="text">
-                <string>保存</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="2">
-              <widget class="QPushButton" name="pushButton_10">
-               <property name="text">
-                <string>频率设置</string>
-               </property>
-              </widget>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_10">
+               <item>
+                <widget class="QLabel" name="label_6">
+                 <property name="text">
+                  <string>FFT</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="doubleSpinBox_2"/>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_4">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
              </item>
             </layout>
            </item>
@@ -435,7 +433,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>797</width>
+     <width>971</width>
      <height>26</height>
     </rect>
    </property>
@@ -449,11 +447,6 @@
     <addaction name="separator"/>
     <addaction name="actionSave"/>
     <addaction name="actionSave_As"/>
-    <addaction name="separator"/>
-    <addaction name="actionExport_Data"/>
-    <addaction name="actionExport_Data_As"/>
-    <addaction name="separator"/>
-    <addaction name="action_Exit"/>
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
@@ -467,17 +460,7 @@
      <addaction name="actionLine_Color"/>
      <addaction name="actionPoint_Color"/>
     </widget>
-    <widget class="QMenu" name="menuSignal">
-     <property name="title">
-      <string>Signal</string>
-     </property>
-     <addaction name="actionSquare"/>
-     <addaction name="actionTriangle"/>
-     <addaction name="actionSin"/>
-    </widget>
-    <addaction name="menuSignal"/>
     <addaction name="menuColor_Setting"/>
-    <addaction name="actionStyle_Sheet"/>
    </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
@@ -527,7 +510,7 @@
   </action>
   <action name="actionSave">
    <property name="text">
-    <string>Save Image</string>
+    <string>Save</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
@@ -551,56 +534,6 @@
   <action name="actionPoint_Color">
    <property name="text">
     <string>Point Color</string>
-   </property>
-  </action>
-  <action name="actionExport_Data">
-   <property name="text">
-    <string>Export Data</string>
-   </property>
-  </action>
-  <action name="actionExport_Data_As">
-   <property name="text">
-    <string>Export Data As...</string>
-   </property>
-  </action>
-  <action name="action_Exit">
-   <property name="text">
-    <string>Exit</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Q</string>
-   </property>
-  </action>
-  <action name="actionSquare">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Square</string>
-   </property>
-  </action>
-  <action name="actionTriangle">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Triangle </string>
-   </property>
-  </action>
-  <action name="actionSin">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Sine</string>
-   </property>
-  </action>
-  <action name="actionStyle_Sheet">
-   <property name="text">
-    <string>Style Sheet</string>
    </property>
   </action>
  </widget>
