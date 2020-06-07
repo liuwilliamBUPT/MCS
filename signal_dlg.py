@@ -37,7 +37,7 @@ class Signal(QDialog, Ui_Dialog):
         """
         # TODO: not implemented yet
         if checked:
-            self.freq = 10
+            self.freq = 100
     
     @pyqtSlot(bool)
     def on_radioButton_2_toggled(self, checked):
@@ -49,7 +49,7 @@ class Signal(QDialog, Ui_Dialog):
         """
         # TODO: not implemented yet
         if checked:
-            self.freq = 100
+            self.freq = 500
     
     @pyqtSlot(bool)
     def on_radioButton_3_toggled(self, checked):
@@ -61,4 +61,4 @@ class Signal(QDialog, Ui_Dialog):
         """
         # TODO: not implemented yet
         if checked:
-            self.freq = 1000
+            self.freq = 2000
