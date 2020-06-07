@@ -57,7 +57,7 @@ class MCS(QMainWindow, Ui_MCS):
         self.lineEdit_4.setValidator(QRegExpValidator(regex, self))
 
         # 一些初始化变量值
-        self.scrollbar_value = 1000
+        self.scrollbar_value = 1
         self.signal_wave = None
         self.amplitude = 2.5, 2.5
         self.data = None
@@ -155,13 +155,14 @@ class MCS(QMainWindow, Ui_MCS):
         """
         signal_dlg.show()
 
-    def generate_signal(self, freq, sample_freq):
+    def generate_signal(self, freq, sample_point):
         """根据传入参数及预设，生成对应信号。"""
         # 函数的相位
-        phase = 2 * np.pi * freq * sample_freq
+        phase = 2 * np.pi * freq * sample_point
 
         # 模拟产生噪音信号
-        noise = np.random.randn(*np.shape(sample_freq)) / 10
+        noise = np.random.randn(*np.shape(sample_point)) / 10
+        # noise = 0
 
         if self.signal_wave == 3:
             # 返回正弦波
@@ -177,49 +178,49 @@ class MCS(QMainWindow, Ui_MCS):
 
     def plot(self):
         """绘制图像。"""
-        # a = self.canvas1.update_figure()
-        # x=np.linspace(0, 1, 5000)
-        # y=7*np.sin(2*np.pi*180*x)
-        # yy=fft(y)                     #快速傅里叶变换
-        # #yreal = yy.real               # 获取实数部分
-        # #yimag = yy.imag               # 获取虚数部分
-
-        # #yf=abs(yy)                # 取绝对值
-        # yf1=abs(yy)/len(x)           #归一化处理
-        # yf2 = yf1[range(int(len(x)/2))]  #由于对称性，只取一半区间
-
-        # xf = np.arange(len(y))        # 频率
-        # #xf1 = xf
-        # xf2 = xf[range(int(len(x)/2))]  #取一半区间
-        # self.canvas1.draw_(x[0:50], y[0:50])
-        # self.canvas2.draw_(xf2,yf2)
+        # 采样时间
+        T = 1
         if self.external_flag:
             x, y, N, f_s = self.resume_data_from_file()
-            self.horizontalScrollBar.setValue(int(N / 100))
+            self.horizontalScrollBar.setValue(int(N / 10))
             self.external_flag = False
         else:
-            N = int(self.scrollbar_value / 10)
-            f_s = 80
-            x = np.linspace(0, 5, N, endpoint=False)
-            # k=np.arange(1,99)
-            # k=2*k-1
-            # y=np.zeros_like(x)
+            # f_s 范围 0.1k~100K 而 scrollbar_value 范围 1~1000
+            f_s = int(self.scrollbar_value * 10)
+
+            # 采样点数 N = T * f_s
+            N = T * f_s
+
+            # 生成采样点集，范围从 0-T 均分 N个点。
+            x = np.linspace(0, T, N, endpoint=False)
+
+            # 设置产生信号的频率
             freq = signal_dlg.freq
-            sample_freq = x
-            y = self.generate_signal(freq, sample_freq)
+
+            # 采样点
+            sample_point = x
+
+            # 生成指定信号
+            y = self.generate_signal(freq, sample_point)
+
+            # 生成用于导出的数据
             self.generate_export_data(x, y, N, f_s)
-            #        y = signal.square(2 * np.pi *5 * x)
-            # for i in range(len(x)):
-            #     y[i]=(4/np.pi)*np.sum(np.sin(k*x[i])/k)
-        xf2 = np.arange(len(y))
-        # y = signal.square(2 * np.pi * 5 * t)
+
+        # FFT 变换
         yf2 = fft(y)
         f = fftfreq(N, 1.0 / f_s)
         mask = np.where(f >= 0)
         xf2 = f[mask]
         yf2 = abs(yf2[mask] / N)
 
-        self.lineEdit.setText(str(np.max(yf2)))
+        self.lineEdit.setText(str(np.max(y) - np.mean(y)))
+
+        y_ac = y - np.mean(y)
+        count = ((y_ac[:-1] * y_ac[1:]) < 0).sum()
+        count = count if count % 2 == 0 else count + 1
+        self.lineEdit_3.setText(f"{2*T/count:.2f}")
+        # self.lineEdit_3.setText(f"{((y_ac[:-1] * y_ac[1:]) < 0).sum():.5f}")
+        self.lineEdit_2.setText(f"{count/(2*T):.2f}")
         self.canvas1.draw_(x, y)
         self.canvas2.draw_(xf2, yf2)
 
@@ -245,14 +246,6 @@ class MCS(QMainWindow, Ui_MCS):
         """
         self.close()
 
-    @pyqtSlot()
-    def on_actionSave_As_triggered(self):
-        """
-        Slot documentation goes here.
-        """
-        # TODO: not implemented yet
-        raise NotImplementedError
-
     @pyqtSlot(int)
     def on_horizontalScrollBar_valueChanged(self, value):
         """
@@ -261,15 +254,18 @@ class MCS(QMainWindow, Ui_MCS):
         @param value DESCRIPTION
         @type int
         """
+        # ScrollBar 范围为 1-1000 所以将从其获得的值除以十倍置于 lineEdit_4。
         self.lineEdit_4.setText(str(value / 10))
-        self.scrollbar_value = value * 1000
+        self.scrollbar_value = value
 
     @pyqtSlot()
     def on_lineEdit_4_editingFinished(self):
         """
-        Slot documentation goes here.
+        当 lineEdit_4 完成编辑，即光标焦点移开或者是敲击 Enter 或 Return 后，
+        该方法生效。
         """
         if self.lineEdit_4.text():
+            # ScrollBar 范围为 1-1000 所以将从文本框中获得的值乘十设置为滑块值。
             value = int(float(self.lineEdit_4.text()) * 10)
             self.horizontalScrollBar.setValue(value)
         else:
@@ -368,17 +364,10 @@ class MCS(QMainWindow, Ui_MCS):
                 file.write(text)
                 file.close()
         else:
+            # 如果没有采集数据，则弹出警告。
             reply = QMessageBox.warning(self, "警告", "请先采集数据！",
                                         QMessageBox.Yes | QMessageBox.No,
                                         QMessageBox.Yes)
-
-    @pyqtSlot()
-    def on_actionExport_Data_As_triggered(self):
-        """
-        Slot documentation goes here.
-        """
-        # TODO: not implemented yet
-        raise NotImplementedError
 
     @pyqtSlot()
     def on_actionSave_triggered(self):
