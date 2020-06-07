@@ -40,10 +40,17 @@ class MCS(QMainWindow, Ui_MCS):
         self.setupUi(self)
 
         # 添加 matplotlib 画布组件用于绘图
-        self.canvas1 = TestCanvas(self.frame)
+        self.canvas1 = Canvas(self.frame,
+                              xlabel="Time(s)", title="Sampled waveform")
+        self.canvas1.get_default_filename = lambda: 'Sampled waveform.png'
+
         self.horizontalLayout_15.addWidget(self.canvas1)
 
-        self.canvas2 = TestCanvas(self.frame)
+        self.canvas2 = Canvas(self.frame,
+                              xlabel="Frequency(Hz)",
+                              title="FFT of Sampled waveform")
+        self.canvas2.get_default_filename = lambda: ('FFT of Sampled '
+                                                     'waveform.png')
         self.horizontalLayout_14.addWidget(self.canvas2)
 
         # 添加 matplotlib 导航工具栏用于操作图像。
@@ -85,6 +92,91 @@ class MCS(QMainWindow, Ui_MCS):
         """保存图像。"""
         self.toolbar1.save_figure()
         self.toolbar2.save_figure()
+
+    def generate_signal(self, freq, sample_point):
+        """根据传入参数及预设，生成对应信号。"""
+        # 函数的相位
+        phase = 2 * np.pi * freq * sample_point
+
+        # 模拟产生噪音信号
+        noise = np.random.randn(*np.shape(sample_point)) / 50
+        # noise = 0
+
+        if self.signal_wave == 3:
+            # 返回正弦波
+            return self.amplitude[0] * np.sin(phase) + noise + self.amplitude[1]
+        elif self.signal_wave == 2:
+            # 返回三角波
+            return (self.amplitude[0] * signal.sawtooth(phase, 0.5) + noise
+                    + self.amplitude[1])
+        else:
+            # 返回方波
+            return (self.amplitude[0] * signal.square(phase) + noise +
+                    self.amplitude[1])
+
+    def plot(self):
+        """绘制图像。"""
+        # 采样时间
+        T = 1
+        if self.external_flag:
+            x, y, N, f_s = self.resume_data_from_file()
+            self.horizontalScrollBar.setValue(int(N / 10))
+            self.external_flag = False
+        else:
+            # f_s 范围 0.1k~400K 而 scrollbar_value 范围 1~1000
+            f_s = int(self.scrollbar_value * 10)
+
+            # 采样点数 N = T * f_s
+            N = T * f_s
+
+            # 生成采样点集，范围从 0-T 均分 N个点。
+            x = np.linspace(0, T, N, endpoint=False)
+
+            # 设置产生信号的频率
+            freq = signal_dlg.freq
+
+            # 采样点
+            sample_point = x
+
+            # 生成指定信号
+            y = self.generate_signal(freq, sample_point)
+
+            # 生成用于导出的数据
+            self.generate_export_data(x, y, N, f_s)
+
+        # FFT 变换
+        yf2 = fft(y)
+        f = fftfreq(N, 1.0 / f_s)
+        mask = np.where(f >= 0)
+        xf2 = f[mask]
+        yf2 = abs(yf2[mask] / N)
+
+        self.lineEdit.setText(f"{np.max(y) - np.mean(y):.4f}")
+
+        y_ac = y - np.mean(y)
+        count = ((y_ac[:-1] * y_ac[1:]) < 0).sum()
+        count = count if count % 2 == 0 else count + 1
+        self.lineEdit_3.setText(f"{2*T/count:.4f}")
+        # self.lineEdit_3.setText(f"{((y_ac[:-1] * y_ac[1:]) < 0).sum():.5f}")
+        self.lineEdit_2.setText(f"{count/(2*T):.2f}")
+        self.canvas1.plot(x, y, "Time(s)", "Amplitude(V)", "Sampled waveform")
+        self.canvas2.plot(xf2, yf2, "Frequency(Hz)", "Amplitude(V)",
+                          "FFT of Sampled waveform")
+
+    def generate_export_data(self, x, y, N, f_s):
+        """生成用于输出的数据。"""
+        self.data = f"{N}\n{f_s}\n" + "\n".join([str(i) for i in zip(x, y)])
+
+    def resume_data_from_file(self):
+        """从文件中恢复数据。"""
+        data = self.data.split("\n")
+        list_data = [eval(i) for i in data[2:]]
+        N = int(data[0])
+        f_s = int(data[1])
+        x, y = map(list, zip(*list_data))
+        x = np.array(x)
+        y = np.array(y)
+        return x, y, N, f_s
 
     @pyqtSlot()
     def on_pushButton_clicked(self):
@@ -155,90 +247,6 @@ class MCS(QMainWindow, Ui_MCS):
         """
         signal_dlg.show()
 
-    def generate_signal(self, freq, sample_point):
-        """根据传入参数及预设，生成对应信号。"""
-        # 函数的相位
-        phase = 2 * np.pi * freq * sample_point
-
-        # 模拟产生噪音信号
-        noise = np.random.randn(*np.shape(sample_point)) / 10
-        # noise = 0
-
-        if self.signal_wave == 3:
-            # 返回正弦波
-            return self.amplitude[0] * np.sin(phase) + noise + self.amplitude[1]
-        elif self.signal_wave == 2:
-            # 返回三角波
-            return (self.amplitude[0] * signal.sawtooth(phase, 0.5) + noise
-                    + self.amplitude[1])
-        else:
-            # 返回方波
-            return (self.amplitude[0] * signal.square(phase) + noise +
-                    self.amplitude[1])
-
-    def plot(self):
-        """绘制图像。"""
-        # 采样时间
-        T = 1
-        if self.external_flag:
-            x, y, N, f_s = self.resume_data_from_file()
-            self.horizontalScrollBar.setValue(int(N / 10))
-            self.external_flag = False
-        else:
-            # f_s 范围 0.1k~100K 而 scrollbar_value 范围 1~1000
-            f_s = int(self.scrollbar_value * 10)
-
-            # 采样点数 N = T * f_s
-            N = T * f_s
-
-            # 生成采样点集，范围从 0-T 均分 N个点。
-            x = np.linspace(0, T, N, endpoint=False)
-
-            # 设置产生信号的频率
-            freq = signal_dlg.freq
-
-            # 采样点
-            sample_point = x
-
-            # 生成指定信号
-            y = self.generate_signal(freq, sample_point)
-
-            # 生成用于导出的数据
-            self.generate_export_data(x, y, N, f_s)
-
-        # FFT 变换
-        yf2 = fft(y)
-        f = fftfreq(N, 1.0 / f_s)
-        mask = np.where(f >= 0)
-        xf2 = f[mask]
-        yf2 = abs(yf2[mask] / N)
-
-        self.lineEdit.setText(str(np.max(y) - np.mean(y)))
-
-        y_ac = y - np.mean(y)
-        count = ((y_ac[:-1] * y_ac[1:]) < 0).sum()
-        count = count if count % 2 == 0 else count + 1
-        self.lineEdit_3.setText(f"{2*T/count:.2f}")
-        # self.lineEdit_3.setText(f"{((y_ac[:-1] * y_ac[1:]) < 0).sum():.5f}")
-        self.lineEdit_2.setText(f"{count/(2*T):.2f}")
-        self.canvas1.draw_(x, y)
-        self.canvas2.draw_(xf2, yf2)
-
-    def generate_export_data(self, x, y, N, f_s):
-        """生成用于输出的数据。"""
-        self.data = f"{N}\n{f_s}\n" + "\n".join([str(i) for i in zip(x, y)])
-
-    def resume_data_from_file(self):
-        """从文件中恢复数据。"""
-        data = self.data.split("\n")
-        list_data = [eval(i) for i in data[2:]]
-        N = int(data[0])
-        f_s = int(data[1])
-        x, y = map(list, zip(*list_data))
-        x = np.array(x)
-        y = np.array(y)
-        return x, y, N, f_s
-
     @pyqtSlot()
     def on_action_Exit_triggered(self):
         """
@@ -252,7 +260,7 @@ class MCS(QMainWindow, Ui_MCS):
         将水平滑动控件与 lineEdit_4 绑定，当滑条数值改变时，对应改变文本框中的数值。
 
         @param value DESCRIPTION
-        @type int
+        @type self, int
         """
         # ScrollBar 范围为 1-1000 所以将从其获得的值除以十倍置于 lineEdit_4。
         self.lineEdit_4.setText(str(value / 10))
@@ -277,7 +285,7 @@ class MCS(QMainWindow, Ui_MCS):
         点击 View-Signal-Square 时，将类属性 signal_wave 设置为1，即表示方波。
         
         @param checked DESCRIPTION
-        @type bool
+        @type self, bool
         """
         self.signal_wave = 1 if checked else None
 
@@ -287,7 +295,7 @@ class MCS(QMainWindow, Ui_MCS):
         点击 View-Signal-Triangle 时，将类属性 signal_wave 设置为2，即表示三角波。
         
         @param checked DESCRIPTION
-        @type bool
+        @type self, bool
         """
         self.signal_wave = 2 if checked else None
 
@@ -297,7 +305,7 @@ class MCS(QMainWindow, Ui_MCS):
         点击 View-Signal-Sine 时，将类属性 signal_wave 设置为3，即表示正弦波。
         
         @param checked DESCRIPTION
-        @type bool
+        @type self, bool
         """
         self.signal_wave = 3 if checked else None
 
@@ -309,7 +317,7 @@ class MCS(QMainWindow, Ui_MCS):
         即输入电压为 0~5V。
 
         @param checked DESCRIPTION
-        @type bool
+        @type self, bool
         """
         if checked:
             self.amplitude = 2.5, 2.5
@@ -321,7 +329,7 @@ class MCS(QMainWindow, Ui_MCS):
         即输入电压为 0~10V。
         
         @param checked DESCRIPTION
-        @type bool
+        @type self, bool
         """
         if checked:
             self.amplitude = 5, 5
@@ -333,7 +341,7 @@ class MCS(QMainWindow, Ui_MCS):
         即输入电压为 -5~+5V。
 
         @param checked DESCRIPTION
-        @type bool
+        @type self, bool
         """
         if checked:
             self.amplitude = 5, 0
@@ -345,7 +353,7 @@ class MCS(QMainWindow, Ui_MCS):
         即输入电压为 -10~+10V。
         
         @param checked DESCRIPTION
-        @type bool
+        @type self, bool
         """
         if checked:
             self.amplitude = 10, 0
@@ -392,9 +400,14 @@ class MCS(QMainWindow, Ui_MCS):
 
 
 class Canvas(FigureCanvas):
-    def __init__(self, parent=None, width=5, height=4, dpi=100):
+    def __init__(self, parent=None, width=5, height=4, dpi=100,
+                 xlabel="Time(s)", title="Sampled waveform"):
         fig = Figure(figsize=(width, height), dpi=dpi)
+        fig.set_tight_layout(True)
         self.axes = fig.add_subplot(111)
+        self.axes.set_ylabel("Amplitude(V)")
+        self.axes.set_xlabel(xlabel)
+        self.axes.set_title(title)
 
         FigureCanvas.__init__(self, fig)
         self.setParent(parent)
@@ -407,18 +420,12 @@ class Canvas(FigureCanvas):
     def compute_initial_figure(self):
         pass
 
-
-class TestCanvas(Canvas):
-    def __init__(self, *args, **kwargs):
-        Canvas.__init__(self, *args, **kwargs)
-
-    def compute_initial_figure(self):
-        self.axes.plot([i for i in range(50)], [i for i in range(50)], 'r')
-
-    def draw_(self, a, b):
-        self.compute_initial_figure()
+    def plot(self, x, y, xlabel, ylabel, title):
         self.axes.clear()
-        self.axes.plot(a, b)
+        self.axes.set_xlabel(xlabel)
+        self.axes.set_ylabel(ylabel)
+        self.axes.set_title(title)
+        self.axes.plot(x, y)
         self.draw()
 
 
