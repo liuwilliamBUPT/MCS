@@ -12,7 +12,8 @@ from scipy.fft import fft, fftfreq
 from scipy import signal
 from PyQt5.QtCore import pyqtSlot, QRegExp
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QSizePolicy,
-                             QActionGroup, QDialog, QFileDialog, QMessageBox)
+                             QActionGroup, QDialog, QFileDialog, QMessageBox,
+                             QColorDialog)
 from PyQt5.QtGui import QRegExpValidator
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import (NavigationToolbar2QT
@@ -70,6 +71,9 @@ class MCS(QMainWindow, Ui_MCS):
         self.data = None
         self.external_flag = False
         self.sample_freq_value = 0.1
+        self.axes_color = "w"
+        self.figure_color = None
+        self.line_color = "C0"
 
         # 将菜单栏中的 signal 选项改为单选。
         self.menuGroupSingal = QActionGroup(self.menuSignal)
@@ -159,9 +163,11 @@ class MCS(QMainWindow, Ui_MCS):
         self.lineEdit_3.setText(f"{2*T/count:.4f}")
         # self.lineEdit_3.setText(f"{((y_ac[:-1] * y_ac[1:]) < 0).sum():.5f}")
         self.lineEdit_2.setText(f"{count/(2*T):.2f}")
-        self.canvas1.plot(x, y, "Time(s)", "Amplitude(V)", "Sampled waveform")
+        self.canvas1.plot(x, y, "Time(s)", "Amplitude(V)", "Sampled waveform",
+                          self.line_color, self.axes_color, self.figure_color)
         self.canvas2.plot(xf2, yf2, "Frequency(Hz)", "Amplitude(V)",
-                          "FFT of Sampled waveform")
+                          "FFT of Sampled waveform", self.line_color,
+                          self.axes_color, self.figure_color)
 
     def generate_export_data(self, x, y, N, f_s):
         """生成用于输出的数据。"""
@@ -398,6 +404,30 @@ class MCS(QMainWindow, Ui_MCS):
             self.external_flag = True
             file.close()
 
+    @pyqtSlot()
+    def on_actionLine_Color_triggered(self):
+        """
+        Slot documentation goes here.
+        """
+        color = QColorDialog.getColor()
+        self.line_color = color.name()
+    
+    @pyqtSlot()
+    def on_actionFigure_Color_triggered(self):
+        """
+        Slot documentation goes here.
+        """
+        color = QColorDialog.getColor()
+        self.figure_color = color.name()
+    
+    @pyqtSlot()
+    def on_actionAxes_Color_triggered(self):
+        """
+        Slot documentation goes here.
+        """
+        color = QColorDialog.getColor()
+        self.axes_color = color.name()
+
 
 class Canvas(FigureCanvas):
     def __init__(self, parent=None, width=5, height=4, dpi=100,
@@ -420,12 +450,15 @@ class Canvas(FigureCanvas):
     def compute_initial_figure(self):
         pass
 
-    def plot(self, x, y, xlabel, ylabel, title):
+    def plot(self, x, y, xlabel, ylabel, title, color, face_color, fig_color):
         self.axes.clear()
         self.axes.set_xlabel(xlabel)
         self.axes.set_ylabel(ylabel)
         self.axes.set_title(title)
-        self.axes.plot(x, y)
+        self.axes.set_facecolor(face_color)
+        if fig_color:
+            self.figure.set_facecolor(fig_color)
+        self.axes.plot(x, y, color)
         self.draw()
 
 

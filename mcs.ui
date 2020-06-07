@@ -469,9 +469,9 @@
      <property name="title">
       <string>Color Setting</string>
      </property>
-     <addaction name="actionBackgroud_Color"/>
      <addaction name="actionLine_Color"/>
-     <addaction name="actionPoint_Color"/>
+     <addaction name="actionAxes_Color"/>
+     <addaction name="actionFigure_Color"/>
     </widget>
     <widget class="QMenu" name="menuSignal">
      <property name="title">
@@ -539,9 +539,9 @@
     <string>Ctrl+S</string>
    </property>
   </action>
-  <action name="actionBackgroud_Color">
+  <action name="actionAxes_Color">
    <property name="text">
-    <string>Backgroud Color</string>
+    <string>Axes Color</string>
    </property>
   </action>
   <action name="actionLine_Color">
@@ -600,6 +600,11 @@
   <action name="actionStyle_Sheet">
    <property name="text">
     <string>Style Sheet</string>
+   </property>
+  </action>
+  <action name="actionFigure_Color">
+   <property name="text">
+    <string>Figure Color</string>
    </property>
   </action>
  </widget>
