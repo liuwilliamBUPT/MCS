@@ -25,40 +25,37 @@ class Signal(QDialog, Ui_Dialog):
         self.setupUi(self)
         self.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowCloseButtonHint)
         
-        self.freq = 10;
+        self.freq = 100
     
     @pyqtSlot(bool)
     def on_radioButton_toggled(self, checked):
         """
-        Slot documentation goes here.
+        设置频率 100 Hz
         
         @param checked DESCRIPTION
-        @type bool
+        @type self, bool
         """
-        # TODO: not implemented yet
         if checked:
             self.freq = 100
     
     @pyqtSlot(bool)
     def on_radioButton_2_toggled(self, checked):
         """
-        Slot documentation goes here.
+        设置频率 500 Hz
         
         @param checked DESCRIPTION
-        @type bool
+        @type self, bool
         """
-        # TODO: not implemented yet
         if checked:
             self.freq = 500
     
     @pyqtSlot(bool)
     def on_radioButton_3_toggled(self, checked):
         """
-        Slot documentation goes here.
+        设置频率 2000 Hz
         
         @param checked DESCRIPTION
-        @type bool
+        @type self, bool
         """
-        # TODO: not implemented yet
         if checked:
             self.freq = 2000
