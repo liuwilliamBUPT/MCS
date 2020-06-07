@@ -326,7 +326,7 @@ class Ui_MCS(object):
         self.menuSignal.setTitle(_translate("MCS", "Signal"))
         self.menu_3.setTitle(_translate("MCS", "Help(&H)"))
         self.actionsome_help.setText(_translate("MCS", "MCS Help"))
-        self.actionsome_help.setShortcut(_translate("MCS", "Ctrl+Shift+/"))
+        self.actionsome_help.setShortcut(_translate("MCS", "Ctrl+?"))
         self.actionabout_some.setText(_translate("MCS", "About MCS"))
         self.actionNew.setText(_translate("MCS", "New..."))
         self.actionNew.setShortcut(_translate("MCS", "Ctrl+N"))

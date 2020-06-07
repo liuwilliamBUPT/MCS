@@ -438,7 +438,26 @@ class MCS(QMainWindow, Ui_MCS):
         """
         if self.lineEdit_5.text():
             self.sample_time = int(self.lineEdit_5.text())
-
+    
+    @pyqtSlot()
+    def on_actionabout_some_triggered(self):
+        """
+        Slot documentation goes here.
+        """
+        reply = QMessageBox.about(self, "About", ("This program is designed "
+                                                  "for Measurement and Control "
+                                                  "System course.\n"
+                                                  "Author: Weiliang Liu, "
+                                                  "Yichen Zhang"))
+    
+    @pyqtSlot()
+    def on_actionsome_help_triggered(self):
+        """
+        Slot documentation goes here.
+        """
+        reply = QMessageBox.information(self, "帮助", "没有什么帮助！",
+                                    QMessageBox.Yes | QMessageBox.No,
+                                    QMessageBox.Yes)
 
 class Canvas(FigureCanvas):
     def __init__(self, parent=None, width=5, height=4, dpi=100,
