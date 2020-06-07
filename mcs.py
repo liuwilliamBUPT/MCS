@@ -14,7 +14,7 @@ from PyQt5.QtCore import pyqtSlot, QRegExp
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QSizePolicy,
                              QActionGroup, QDialog, QFileDialog, QMessageBox,
                              QColorDialog)
-from PyQt5.QtGui import QRegExpValidator
+from PyQt5.QtGui import QRegExpValidator, QIntValidator
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import (NavigationToolbar2QT
                                                 as NavigationToolbar)
@@ -64,6 +64,8 @@ class MCS(QMainWindow, Ui_MCS):
         regex = QRegExp(r'^100(\.0)?$|^[1-9]?[0-9](\.[0-9])?$')
         self.lineEdit_4.setValidator(QRegExpValidator(regex, self))
 
+        self.lineEdit_5.setValidator(QIntValidator())
+
         # 一些初始化变量值
         self.scrollbar_value = 1
         self.signal_wave = None
@@ -74,6 +76,7 @@ class MCS(QMainWindow, Ui_MCS):
         self.axes_color = "w"
         self.figure_color = None
         self.line_color = "C0"
+        self.sample_time = 5
 
         # 将菜单栏中的 signal 选项改为单选。
         self.menuGroupSingal = QActionGroup(self.menuSignal)
@@ -121,7 +124,7 @@ class MCS(QMainWindow, Ui_MCS):
     def plot(self):
         """绘制图像。"""
         # 采样时间
-        T = 1
+        T = self.sample_time
         if self.external_flag:
             x, y, N, f_s = self.resume_data_from_file()
             self.horizontalScrollBar.setValue(int(N / 10))
@@ -427,6 +430,14 @@ class MCS(QMainWindow, Ui_MCS):
         """
         color = QColorDialog.getColor()
         self.axes_color = color.name()
+    
+    @pyqtSlot()
+    def on_lineEdit_5_editingFinished(self):
+        """
+        Slot documentation goes here.
+        """
+        if self.lineEdit_5.text():
+            self.sample_time = int(self.lineEdit_5.text())
 
 
 class Canvas(FigureCanvas):
