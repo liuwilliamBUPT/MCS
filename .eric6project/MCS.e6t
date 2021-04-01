@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Tasks SYSTEM "Tasks-6.0.dtd">
+<!-- eric6 tasks file for project MCS -->
+<!-- Saved: 2021-03-24, 22:39:17 -->
+<Tasks version="6.0">
+  <ProjectScanFilter></ProjectScanFilter>
+  <Task priority="1" completed="False" type="1" uid="{7e5893fb-8ac7-4ab7-8915-459e1b632daf}">
+    <Summary>TODO: not implemented yet</Summary>
+    <Description></Description>
+    <Created>2021-03-24, 22:35:02</Created>
+    <Resource>
+      <Filename>Measure.py</Filename>
+      <Linenumber>40</Linenumber>
+    </Resource>
+  </Task>
+  <Task priority="1" completed="False" type="1" uid="{7f494bec-946d-47a0-8dcb-773369ac0bb2}">
+    <Summary>TODO: not implemented yet</Summary>
+    <Description></Description>
+    <Created>2021-03-24, 22:35:02</Created>
+    <Resource>
+      <Filename>Measure.py</Filename>
+      <Linenumber>48</Linenumber>
+    </Resource>
+  </Task>
+</Tasks>
