@@ -61,10 +61,10 @@ class MCS(QMainWindow, Ui_MCS):
         self.toolbar2.hide()
 
         # 为文本框添加 validator
-        regex = QRegExp(r'^100(\.0)?$|^[1-9]?[0-9](\.[0-9])?$')
+        regex = QRegExp(r'^400(\.0)?$|^[1-3]?[0-9]{1,2}(\.[0-9])?$')
         self.lineEdit_4.setValidator(QRegExpValidator(regex, self))
 
-        self.lineEdit_5.setValidator(QIntValidator())
+        self.lineEdit_5.setValidator(QRegExpValidator(QRegExp(r'^([1-9][0-9]{0,1}|100)$'),  self)) # 采样时间限制
 
         # 一些初始化变量值
         self.scrollbar_value = 1
